@@ -2,6 +2,7 @@ package org.example;
 
 import java.nio.file.Path;
 
+import io.ocfl.api.OcflOption;
 import io.ocfl.api.OcflRepository;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.VersionInfo;
@@ -21,11 +22,15 @@ public class RepositoryService {
             .build();
     }
 
-    public RepositoryService createObject(String id, Path inputPath, String message, User user) {
+    private VersionInfo createNewVersion(User user, String message) {
+        return new VersionInfo().setUser(user.username(), user.email()).setMessage(message);
+    }
+
+    public RepositoryService createObject(String id, Path inputPath, User user, String message) {
         repo.putObject(
             ObjectVersionId.head(id),
             inputPath,
-            new VersionInfo().setUser(user.username(), user.email()).setMessage(message)
+            createNewVersion(user, message)
         );
         return this;
     }
@@ -44,7 +49,23 @@ public class RepositoryService {
         return repo.containsObject(id);
     }
 
+    public RepositoryService deleteObjectFile(String objectId, String filePath, User user, String message) {
+        repo.updateObject(
+            ObjectVersionId.head(objectId),
+            createNewVersion(user, message),
+            updater -> { updater.removeFile(filePath); }
+        );
+        return this;
+    }
 
-    // public RepositoryService updateObject(...)
-    // }
+    public RepositoryService updateObjectFile(
+        String objectId, Path inputPath, String filePath, User user, String message
+    ) {
+        repo.updateObject(
+            ObjectVersionId.head(objectId),
+            createNewVersion(user, message),
+            updater -> { updater.addPath(inputPath, filePath, OcflOption.OVERWRITE); }
+        );
+        return this;
+    }
 }

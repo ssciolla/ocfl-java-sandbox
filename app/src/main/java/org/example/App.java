@@ -12,6 +12,7 @@ public class App {
     public static void demoOCFL() {
         Path rootPath = Paths.get("storage/root");
         Path workPath = Paths.get("storage/work");
+        Path stagingPath = Paths.get("storage/staging");
         String firstId = "1";
 
         User user = new User("testuser", "test@example.edu");
@@ -21,7 +22,16 @@ public class App {
             repoService.deleteObject(firstId);
         }
 
-        repoService.createObject(firstId, Paths.get("storage/staging/input/1"), "Initial version.", user);
+        repoService.createObject(firstId, Paths.get(stagingPath.toString(), "/input/1"), user, "Initial version.");
+        repoService.deleteObjectFile(firstId, "b.txt", user, "Delete b.");
+        repoService.updateObjectFile(
+            firstId,
+            Paths.get(stagingPath.toString(), "/input/new_files/v3-a/a.txt"),
+            "",
+            user,
+            "Replace a."
+        );
+
         repoService.readObject(firstId, Paths.get("storage/staging/output/1"));
     }
 
