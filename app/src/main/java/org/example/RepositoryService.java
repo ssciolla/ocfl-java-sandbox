@@ -21,11 +21,11 @@ public class RepositoryService {
             .build();
     }
 
-    public RepositoryService createObject(String id, Path inputPath, String message) {
+    public RepositoryService createObject(String id, Path inputPath, String message, User user) {
         repo.putObject(
             ObjectVersionId.head(id),
             inputPath,
-            new VersionInfo().setMessage(message)
+            new VersionInfo().setUser(user.username(), user.email()).setMessage(message)
         );
         return this;
     }
@@ -34,6 +34,16 @@ public class RepositoryService {
         repo.getObject(ObjectVersionId.head(id), outputPath);
         return this;
     }
+
+    public RepositoryService deleteObject(String id) {
+        repo.purgeObject(id);
+        return this;
+    }
+
+    public boolean hasObject(String id) {
+        return repo.containsObject(id);
+    }
+
 
     // public RepositoryService updateObject(...)
     // }

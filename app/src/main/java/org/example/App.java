@@ -12,15 +12,17 @@ public class App {
     public static void demoOCFL() {
         Path rootPath = Paths.get("storage/root");
         Path workPath = Paths.get("storage/work");
-    
-        RepositoryService repoService = new RepositoryService(rootPath, workPath);
-
         String firstId = "1";
 
-        repoService.createObject(firstId, Paths.get("storage/staging/input/1"), "Initial version.");
+        User user = new User("testuser", "test@example.edu");
 
+        RepositoryService repoService = new RepositoryService(rootPath, workPath);
+        if (repoService.hasObject(firstId)) {
+            repoService.deleteObject(firstId);
+        }
+
+        repoService.createObject(firstId, Paths.get("storage/staging/input/1"), "Initial version.", user);
         repoService.readObject(firstId, Paths.get("storage/staging/output/1"));
-
     }
 
     public static void main(String[] args) {
